@@ -1,0 +1,64 @@
+trainer:
+  max_epochs: 300
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: 0
+  precision: 16-mixed
+
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      every_n_epochs: 1
+      save_top_k: 1
+      monitor: "metrics/val_iou"
+      mode: "max"
+      save_last: true
+      save_weights_only: true
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      monitor: "metrics/val_iou"
+      mode: "max"
+      patience: 100
+
+  logger:
+    class_path: lightning.pytorch.loggers.CSVLogger
+    init_args:
+      save_dir: "runs"
+      name: "isic2016_vit_query_mul_scale_fusion"
+
+model:
+  class_path: training.medical_binary_segmentation.MedicalBinarySegmentation
+  init_args:
+    num_classes: 2
+    img_size: [256, 256]
+    ignore_idx: 255
+    lr: 5e-4
+    weight_decay: 1e-4
+    metric_threshold: 0.5
+
+    network:
+      class_path: models.eoseg.EoSegMultiQSegFusion
+      init_args:
+        num_classes: 2
+        num_q: 2
+
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            img_size: [256, 256]
+
+data:
+  class_path: datasets.isic_binary_semantic.ISICBinarySemantic
+  init_args:
+    train_image_dir: "datasets/ISBI2016_ISIC_Part1_Training_Data"
+    train_mask_dir: "datasets/ISBI2016_ISIC_Part1_Training_GroundTruth"
+    val_image_dir: "datasets/ISBI2016_ISIC_Part1_Test_Data"
+    val_mask_dir: "datasets/ISBI2016_ISIC_Part1_Test_GroundTruth"
+    test_image_dir: "datasets/ISBI2016_ISIC_Part1_Test_Data"
+    test_mask_dir: "datasets/ISBI2016_ISIC_Part1_Test_GroundTruth"
+    img_size: [256, 256]
+    num_classes: 2
+    batch_size: 32
+    num_workers: 8
+    ignore_idx: 255
+    image_suffix: ".jpg"
+    mask_suffix: "_Segmentation.png"

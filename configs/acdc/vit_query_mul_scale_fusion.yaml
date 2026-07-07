@@ -1,0 +1,58 @@
+trainer:
+  max_epochs: 400
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: 0
+  precision: 16-mixed
+
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      every_n_epochs: 1
+      save_top_k: 1
+      monitor: "metrics/test_mean_dice"
+      mode: "max"
+      save_last: true
+      save_weights_only: true
+  - class_path: training.acdc_test_logger.ACDCTestLogger
+    init_args:
+      history_filename: "acdc_test_history.csv"
+      best_filename: "acdc_best_result.txt"
+
+  logger:
+    class_path: lightning.pytorch.loggers.CSVLogger
+    init_args:
+      save_dir: "runs"
+      name: "acdc_vit_query_mul_scale_fusion"
+
+model:
+  class_path: training.acdc_mask_classification_semantic.ACDCMaskClassificationSemantic
+  init_args:
+    num_classes: 4
+    img_size: [224, 224]
+    attn_mask_annealing_enabled: False
+    ignore_idx: 255
+    lr: 5e-4
+    weight_decay: 0.05
+
+    network:
+      class_path: models.eoseg.EoSegMultiQSegFusion
+      init_args:
+        num_classes: 4
+        num_q: 6
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            img_size: [224, 224]
+
+data:
+  class_path: datasets.acdc_semantic.ACDCSemantic
+  init_args:
+    base_dir: "/scratch/xinli38/eomt/datasets/ACDC"
+    list_dir: "/scratch/xinli38/eomt/datasets/ACDC/lists_ACDC"
+    img_size: [224, 224]
+    num_classes: 4
+    batch_size: 16
+    num_workers: 8
+    ignore_idx: 255
+    drop_background: False
+    make_rgb: True

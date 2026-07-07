@@ -1,0 +1,62 @@
+trainer:
+  max_epochs: 1000
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: 0
+  precision: 16-mixed
+
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      every_n_epochs: 1
+      save_top_k: 1
+      monitor: "metrics/val_dice"
+      mode: "max"
+      save_last: true
+      save_weights_only: true
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      monitor: "metrics/val_dice"
+      mode: "max"
+      patience: 300
+  - class_path: training.medical_val_logger.MedicalValLogger
+    init_args:
+      history_filename: "val_metrics_history.txt"
+      best_filename: "best_metric.txt"
+
+  logger:
+    class_path: lightning.pytorch.loggers.CSVLogger
+    init_args:
+      save_dir: "runs"
+      name: "glas_vit_query_mul_scale_fusion"
+
+model:
+  class_path: training.medical_binary_segmentation.MedicalBinarySegmentation
+  init_args:
+    num_classes: 2
+    img_size: [224, 224]
+    ignore_idx: 255
+    lr: 5e-4
+    weight_decay: 5e-4
+
+    network:
+      class_path: models.eoseg.EoSegMultiQSegFusion
+      init_args:
+        num_classes: 2
+        num_q: 2
+
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            img_size: [224, 224]
+
+data:
+  class_path: datasets.medical_binary_semantic.MedicalBinarySemantic
+  init_args:
+    train_dir: "datasets/GlaS/Train_Folder"
+    val_dir: "datasets/GlaS/Test_Folder"
+    test_dir: "datasets/GlaS/Test_Folder"
+    img_size: [224, 224]
+    num_classes: 2
+    batch_size: 14
+    num_workers: 8
+    ignore_idx: 255

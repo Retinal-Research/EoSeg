@@ -1,0 +1,68 @@
+trainer:
+  max_epochs: 1000
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: 0
+  precision: 16-mixed
+
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      every_n_epochs: 1
+      save_top_k: 1
+      monitor: "metrics/val_iou"
+      mode: "max"
+      save_last: true
+      save_weights_only: true
+  - class_path: lightning.pytorch.callbacks.EarlyStopping
+    init_args:
+      monitor: "metrics/val_iou"
+      mode: "max"
+      patience: 200
+  - class_path: training.medical_val_logger.MedicalValLogger
+    init_args:
+      history_filename: "val_metrics_history.txt"
+      best_filename: "best_metric.txt"
+      monitor: "metrics/val_iou"
+
+  logger:
+    class_path: lightning.pytorch.loggers.CSVLogger
+    init_args:
+      save_dir: "runs"
+      name: "kvasir_vit_query_mul_scale_fusion"
+
+model:
+  class_path: training.medical_binary_segmentation.MedicalBinarySegmentation
+  init_args:
+    num_classes: 2
+    img_size: [256, 256]
+    ignore_idx: 255
+    lr: 5e-4
+    weight_decay: 5e-4
+    metric_threshold: 0.5
+
+    network:
+      class_path: models.eoseg.EoSegMultiQSegFusion
+      init_args:
+        num_classes: 2
+        num_q: 2
+
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            img_size: [256, 256]
+
+data:
+  class_path: datasets.medical_binary_semantic.MedicalBinarySemantic
+  init_args:
+    dataset_dir: "datasets/Kvasir-SEG"
+    train_split: "train"
+    val_split: "val"
+    test_split: "val"
+    train_dir: ""
+    val_dir: ""
+    test_dir: ""
+    img_size: [256, 256]
+    num_classes: 2
+    batch_size: 32
+    num_workers: 8
+    ignore_idx: 255

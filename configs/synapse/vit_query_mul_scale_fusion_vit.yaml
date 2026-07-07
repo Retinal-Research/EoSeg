@@ -1,0 +1,57 @@
+trainer:
+  max_epochs: 200
+  limit_val_batches: 0
+  check_val_every_n_epoch: 1000000
+  precision: 16-mixed
+
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      every_n_epochs: 1
+      save_top_k: 50
+      monitor: "epoch"
+      mode: "max"
+      save_last: true
+      save_weights_only: true
+      save_on_train_epoch_end: true
+
+  logger:
+    class_path: lightning.pytorch.loggers.wandb.WandbLogger
+    init_args:
+      resume: allow
+      project: "eomt"
+      name: "synapse_384_learnable_fusion_query_vit_test" 
+
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    num_classes: 9
+    img_size: [384, 384]
+    attn_mask_annealing_enabled: False
+    ignore_idx: 255
+    lr: 1e-4
+  
+    network:
+      class_path: models.eoseg.EoSegMultiQSegFusion
+      init_args:
+        num_classes: 9
+        num_q: 16
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: vit_large_patch16_384
+
+data:
+  class_path: datasets.synapse_semantic.SynapseSemantic
+  init_args:
+    train_base_dir: "/scratch/xinli38/data/Synapse/train_npz"
+    test_base_dir: "/scratch/xinli38/data/Synapse/test_vol_h5"
+    list_dir: "/scratch/xinli38/data/Synapse/lists/lists_Synapse"
+    img_size: [384, 384]
+    num_classes: 9
+    batch_size: 16
+    num_workers: 8
+    ignore_idx: 255
+    drop_background: False
+    make_rgb: True
+
