@@ -1,6 +1,7 @@
 # EoSeg: Does Your ViT Still Need U-Net for Segmentation?
 
 [![Code](https://img.shields.io/badge/GitHub-Code-black)](https://github.com/Retinal-Research/EoSeg)
+[![Paper](https://img.shields.io/badge/arXiv-2607.00223-b31b1b)](https://arxiv.org/abs/2607.00223)
 
 ---
 
@@ -101,3 +102,12 @@ Please update dataset paths and checkpoint paths in the YAML configs to match yo
 
 - The repository keeps a compact set of visualization utilities under `scripts/`.
 - The YAML files under `configs/synapse/` include the main model configuration plus retained ablation settings.
+
+---
+
+## Acknowledgement
+
+This codebase is developed with code reference to:
+
+- EOMT: [https://github.com/tue-mps/EoMT](https://github.com/tue-mps/EoMT)
+- TransUNet: [https://github.com/Beckschen/TransUNet](https://github.com/Beckschen/TransUNet)
