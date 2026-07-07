@@ -111,3 +111,18 @@ This codebase is developed with code reference to:
 
 - EOMT: [https://github.com/tue-mps/EoMT](https://github.com/tue-mps/EoMT)
 - TransUNet: [https://github.com/Beckschen/TransUNet](https://github.com/Beckschen/TransUNet)
+
+---
+
+## Citation
+
+If you find this repository useful, please consider citing:
+
+```bibtex
+@article{li2026does,
+  title   = {Does Your ViT Still Need U-Net for Segmentation?},
+  author  = {Li, Xin and Zhu, Wenhui and Dong, Xuanzhao and Chen, Xiwen and Chen, Yanxi and Xiong, Yujian and Wang, Hao and Dumitrascu, Oana M and Wang, Yalin},
+  journal = {arXiv preprint arXiv:2607.00223},
+  year    = {2026}
+}
+```
