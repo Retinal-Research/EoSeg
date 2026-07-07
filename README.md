@@ -119,7 +119,7 @@ This codebase is developed with code reference to:
 If you find this repository useful, please consider citing:
 
 ```bibtex
-@article{li2026does,
+@article{eoseg,
   title   = {Does Your ViT Still Need U-Net for Segmentation?},
   author  = {Li, Xin and Zhu, Wenhui and Dong, Xuanzhao and Chen, Xiwen and Chen, Yanxi and Xiong, Yujian and Wang, Hao and Dumitrascu, Oana M and Wang, Yalin},
   journal = {arXiv preprint arXiv:2607.00223},
